@@ -1,0 +1,272 @@
+[
+  {
+    "HsbTrianglesList": [
+      {
+        "Id": 7,
+        "ShapeType": 1,
+        "Pt1": [19, 566],
+        "Pt2": [168, 606],
+        "Pt3": [94, 366],
+        "Area": 17553.238890645793,
+        "GeometricCenterPoint": [94, 513]
+      },
+      {
+        "Id": 11,
+        "ShapeType": 1,
+        "Pt1": [7, 512],
+        "Pt2": [173, 539],
+        "Pt3": [90, 304],
+        "Area": 18856.664158520522,
+        "GeometricCenterPoint": [90, 452]
+      },
+      {
+        "Id": 13,
+        "ShapeType": 1,
+        "Pt1": [21, 359],
+        "Pt2": [149, 320],
+        "Pt3": [150, 553],
+        "Area": 14920.832894831896,
+        "GeometricCenterPoint": [107, 411]
+      },
+      {
+        "Id": 16,
+        "ShapeType": 1,
+        "Pt1": [556, 269],
+        "Pt2": [597, 259],
+        "Pt3": [630, 481],
+        "Area": 4719.6497191205272,
+        "GeometricCenterPoint": [594, 336]
+      },
+      {
+        "Id": 17,
+        "ShapeType": 1,
+        "Pt1": [519, 231],
+        "Pt2": [669, 297],
+        "Pt3": [503, 471],
+        "Area": 18514.363782818429,
+        "GeometricCenterPoint": [564, 333]
+      },
+      {
+        "Id": 22,
+        "ShapeType": 1,
+        "Pt1": [638, 168],
+        "Pt2": [803, 140],
+        "Pt3": [758, 378],
+        "Area": 19006.106450587744,
+        "GeometricCenterPoint": [733, 229]
+      }
+    ],
+    "HsbRectanglesList": [
+      {
+        "Id": 5,
+        "ShapeType": 2,
+        "Pt1": [162, 282],
+        "Pt2": [138, 126],
+        "Pt3": [274, 105],
+        "Pt4": [298, 261],
+        "GeometricCenterPoint": [218, 194],
+        "Area": 21642.285646672826
+      },
+      {
+        "Id": 8,
+        "ShapeType": 2,
+        "Pt1": [513, 355],
+        "Pt2": [451, 221],
+        "Pt3": [298, 292],
+        "Pt4": [360, 426],
+        "GeometricCenterPoint": [406, 324],
+        "Area": 24843.663749244297
+      },
+      {
+        "Id": 14,
+        "ShapeType": 2,
+        "Pt1": [515, 248],
+        "Pt2": [453, 114],
+        "Pt3": [300, 185],
+        "Pt4": [362, 319],
+        "GeometricCenterPoint": [408, 216],
+        "Area": 24843.663749244297
+      },
+      {
+        "Id": 23,
+        "ShapeType": 2,
+        "Pt1": [336, 300],
+        "Pt2": [190, 312],
+        "Pt3": [182, 208],
+        "Pt4": [328, 196],
+        "GeometricCenterPoint": [259, 254],
+        "Area": 15273.846231567906
+      }
+    ],
+    "HsbRhombusList": [
+      {
+        "Id": 2,
+        "ShapeType": 3,
+        "Pt1": [454, 211],
+        "Pt2": [512, 134],
+        "Pt3": [589, 191],
+        "Pt4": [532, 268],
+        "Area": 9312.4991550493287,
+        "GeometricCenterPoint": [522, 201]
+      },
+      {
+        "Id": 6,
+        "ShapeType": 3,
+        "Pt1": [473, 367],
+        "Pt2": [360, 325],
+        "Pt3": [320, 438],
+        "Pt4": [432, 480],
+        "Area": 14425.350238910178,
+        "GeometricCenterPoint": [396, 402]
+      },
+      {
+        "Id": 15,
+        "ShapeType": 3,
+        "Pt1": [172, 254],
+        "Pt2": [129, 319],
+        "Pt3": [194, 363],
+        "Pt4": [237, 298],
+        "Area": 6125.77979379287,
+        "GeometricCenterPoint": [183, 308]
+      },
+      {
+        "Id": 20,
+        "ShapeType": 3,
+        "Pt1": [540, 442],
+        "Pt2": [598, 364],
+        "Pt3": [675, 422],
+        "Pt4": [618, 500],
+        "Area": 9312.4991550493287,
+        "GeometricCenterPoint": [608, 432]
+      },
+      {
+        "Id": 21,
+        "ShapeType": 3,
+        "Pt1": [227, 201],
+        "Pt2": [322, 316],
+        "Pt3": [426, 210],
+        "Pt4": [332, 95],
+        "Area": 22045.554321638192,
+        "GeometricCenterPoint": [326, 206]
+      }
+    ],
+    "HsbCirclesList": [
+      {
+        "Id": 3,
+        "ShapeType": 4,
+        "PtUbication": [437, 279],
+        "Pt1": [486, 279],
+        "Radius": 49,
+        "Area": 7542.962392,
+        "GeometricCenterPoint": [486, 328]
+      },
+      {
+        "Id": 9,
+        "ShapeType": 4,
+        "PtUbication": [454, 296],
+        "Pt1": [512, 296],
+        "Radius": 58,
+        "Area": 10568.315488,
+        "GeometricCenterPoint": [512, 354]
+      },
+      {
+        "Id": 12,
+        "ShapeType": 4,
+        "PtUbication": [292, 315],
+        "Pt1": [379, 315],
+        "Radius": 87,
+        "Area": 23778.709848000002,
+        "GeometricCenterPoint": [379, 402]
+      },
+      {
+        "Id": 18,
+        "ShapeType": 4,
+        "PtUbication": [309, 332],
+        "Pt1": [346, 332],
+        "Radius": 36,
+        "Area": 4071.503232,
+        "GeometricCenterPoint": [346, 368]
+      }
+    ],
+    "HsbEllipsesList": [
+      {
+        "Id": 1,
+        "ShapeType": 5,
+        "PtUbication": [713, 317],
+        "Pt1": [749, 317],
+        "Pt2": [713, 326],
+        "WidthDiameter": 72,
+        "HeigthDiameter": 18,
+        "WidthRadius": 36,
+        "HeightRadius": 9,
+        "Area": 1018,
+        "GeometricCenterPoint": [749, 326]
+      },
+      {
+        "Id": 4,
+        "ShapeType": 5,
+        "PtUbication": [438, 336],
+        "Pt1": [519, 336],
+        "Pt2": [438, 361],
+        "WidthDiameter": 162,
+        "HeigthDiameter": 50,
+        "WidthRadius": 81,
+        "HeightRadius": 25,
+        "Area": 6362,
+        "GeometricCenterPoint": [519, 361]
+      },
+      {
+        "Id": 10,
+        "ShapeType": 5,
+        "PtUbication": [149, 333],
+        "Pt1": [179, 333],
+        "Pt2": [149, 344],
+        "WidthDiameter": 60,
+        "HeigthDiameter": 22,
+        "WidthRadius": 30,
+        "HeightRadius": 11,
+        "Area": 1037,
+        "GeometricCenterPoint": [179, 344]
+      },
+      {
+        "Id": 19,
+        "ShapeType": 5,
+        "PtUbication": [162, 328],
+        "Pt1": [207, 328],
+        "Pt2": [162, 373],
+        "WidthDiameter": 90,
+        "HeigthDiameter": 90,
+        "WidthRadius": 45,
+        "HeightRadius": 45,
+        "Area": 6362,
+        "GeometricCenterPoint": [207, 373]
+      },
+      {
+        "Id": 24,
+        "ShapeType": 5,
+        "PtUbication": [562, 271],
+        "Pt1": [646, 271],
+        "Pt2": [562, 315],
+        "WidthDiameter": 168,
+        "HeigthDiameter": 88,
+        "WidthRadius": 84,
+        "HeightRadius": 44,
+        "Area": 11611,
+        "GeometricCenterPoint": [646, 315]
+      },
+      {
+        "Id": 25,
+        "ShapeType": 5,
+        "PtUbication": [246, 287],
+        "Pt1": [302, 287],
+        "Pt2": [246, 316],
+        "WidthDiameter": 112,
+        "HeigthDiameter": 58,
+        "WidthRadius": 56,
+        "HeightRadius": 29,
+        "Area": 5102,
+        "GeometricCenterPoint": [302, 316]
+      }
+    ]
+  }
+]
