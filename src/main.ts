@@ -1,13 +1,10 @@
 import { addElementManipulation } from "./manipulation";
 import {
   orientPoly,
-  // getMinXMinYPoint,
   getPolyTopRightBoundryPt,
   getPointsFromArray,
   translatePoly,
   getPolyMinLeftBoundryPt,
-  getArrayFromPoints,
-  translateHFigureByPts,
   intersectionPt,
 } from "./geometry";
 // import HRect from "./models/hrect.ts";
@@ -16,6 +13,7 @@ import HTriangle from "./models/htriangle";
 import Konva from "konva";
 import data from "../src/data/hsbExam.json";
 import HPoint from "./models/hpoint";
+import { createKonvaRect, createKonvaTriangle } from "./helpers/konva-helper";
 
 //#region import source
 // import * as data from "./data/hsbExam.json" assert { type: "json" };
@@ -30,15 +28,7 @@ const rectsJson = data[0].HsbRectanglesList;
 //#endregion
 
 //#region config
-const triangleColor = "#33D267";
-const rectColor = "skyblue";
-// const rombColor = "orange";
-// const circleColor = "IndianRed";
-// const ellipseColor = "deeppink";
-const strokeColor = "black";
-const strokeWidth = 2;
-const figureOpacity = 0.8;
-const gap = 5;
+var gap = 10;
 var canvaWidth = 900;
 var canvaHeight = 610;
 //#endregion
@@ -56,28 +46,20 @@ stage.add(layer);
 
 //#endregion
 
-const freeSpace = [];
+const freeSpace: any[] = [];
 
 // push some extra rects ...
-// rectsJson.push(...rectsJson);
-// rectsJson.push(...rectsJson);
+// for (let idx = 0; idx < 7; idx++) {
+//   const randoM = Math.floor(Math.random() * rectsJson.length);
+//   rectsJson.push(rectsJson[randoM]);
+// }
 
 //#region rects
 const rects: Konva.Line[] = rectsJson.map((r: any) => {
-  const rect = new Konva.Line({
-    points: [...r.Pt1, ...r.Pt2, ...r.Pt3, ...r.Pt4],
-    fill: rectColor,
-    stroke: strokeColor,
-    draggable: true,
-    strokeWidth: strokeWidth,
-    closed: true,
-    opacity: figureOpacity,
-    name: "poly",
-  });
-  return rect;
+  return createKonvaRect(
+    getPointsFromArray([...r.Pt1, ...r.Pt2, ...r.Pt3, ...r.Pt4])
+  );
 });
-
-// rects.push(rect1);
 
 let lastX = gap;
 let lastY = gap;
@@ -111,8 +93,13 @@ lastY = maxRowH + gap;
 //#endregion
 
 //#region tringles
-// trianglesJson.push(trianglesJson[2]);
-// trianglesJson.push(trianglesJson[1]);
+
+// add some random triangles
+// for (let idx = 0; idx < 0; idx++) {
+//   const randoM = Math.floor(Math.random() * trianglesJson.length);
+//   trianglesJson.push(trianglesJson[randoM]);
+// }
+
 const triangles: HTriangle[] = trianglesJson.map((t: any) => {
   const pointsInts = [...t.Pt1, ...t.Pt2, ...t.Pt3];
   const tri = new HTriangle(getPointsFromArray(pointsInts));
@@ -124,18 +111,33 @@ triangles.sort((a, b) => b.rightAngle - a.rightAngle);
 
 lastX = gap;
 let swap = false;
-let lastTriangle: HTriangle;
+let lastTriangle: HTriangle | undefined;
+
 triangles.forEach((t) => {
   let lastRightAngle = lastTriangle?.rightAngle ?? Math.PI;
-  if (swap) t.rotate(t.middlePt, Math.PI);
-  const leftMinPt = t.bottonLeftPt;
-  translateHFigureByPts(t, 0, lastY - leftMinPt.y);
 
+  // if too many triangles,  move to next row up
+  if (lastTriangle && lastTriangle.maxX + t.width + gap > canvaWidth) {
+    swap = false;
+    lastY = maxRowH + gap;
+    lastTriangle = undefined;
+  }
+
+  // rotate every even traingle by 180 deg
+  if (swap) t.rotate(t.middlePt, Math.PI);
+
+  const leftMinPt = t.bottonLeftPt;
+  t.translate(0, lastY - leftMinPt.y);
+
+  // check offset from last item to calculate x position
   let startPoint: HPoint;
   let compareX: number;
   const topLeftPt = t.topLeftPt;
   const bottonLeftPt = t.bottonLeftPt;
-  if (swap ? t.leftAngle < lastRightAngle : t.leftAngle > lastRightAngle) {
+  if (
+    lastTriangle &&
+    (swap ? t.leftAngle < lastRightAngle : t.leftAngle > lastRightAngle)
+  ) {
     const lastTopRight = lastTriangle.topRightPt;
     const vstart = topLeftPt.y >= lastTopRight.y ? lastTopRight : topLeftPt;
 
@@ -153,24 +155,16 @@ triangles.forEach((t) => {
     compareX = lastTriangle?.bottomRightPt.x ?? gap;
   }
 
-  translateHFigureByPts(t, compareX - startPoint.x + gap, 0);
+  t.translate(compareX - startPoint.x + gap, 0);
 
   lastRightAngle = t.rightAngle;
   lastTriangle = t;
+
+  maxRowH = Math.max(t.maxY, maxRowH);
   swap = !swap;
 
-  layer.add(
-    new Konva.Line({
-      points: getArrayFromPoints(t.pts),
-      fill: triangleColor,
-      stroke: strokeColor,
-      draggable: true,
-      strokeWidth: 2,
-      closed: true,
-      name: "poly",
-      opacity: figureOpacity,
-    })
-  );
+  // add renderd item to scene
+  layer.add(createKonvaTriangle(t.pts));
 });
 //#endregion
 
@@ -188,7 +182,7 @@ triangles.forEach((t) => {
 //   return romb;
 // });
 // rombs.forEach((rh) => {
-//   //   layer.add(rh);
+//   // layer.add(rh);
 // });
 //#endregion
 
@@ -208,7 +202,7 @@ triangles.forEach((t) => {
 //   return circle;
 // });
 // circles.forEach((c) => {
-//   //   layer.add(c);
+//   // layer.add(c);
 // });
 //#endregion
 
@@ -229,7 +223,7 @@ triangles.forEach((t) => {
 // });
 
 // ellipses.forEach((e) => {
-//   //   layer.add(e);
+//   // layer.add(e);
 // });
 //#endregion
 

@@ -57,6 +57,7 @@ export default class HPolygon {
     });
     return sortedPts[0];
   }
+
   get bottomRightPt() {
     const sortedPts = this.pts.sort((a, b) => {
       if (a.y > b.y) return 1;
@@ -67,6 +68,7 @@ export default class HPolygon {
     });
     return sortedPts[0];
   }
+
   get bottonLeftPt() {
     const sortedPts = this.pts.sort((a, b) => {
       if (a.y > b.y) return 1;
@@ -138,5 +140,12 @@ export default class HPolygon {
       return new HPoint(newX, newY);
     });
     this.pts = rotated;
+  };
+
+  translate = (deltaX: number, deltaY: number) => {
+    const transPts = this.pts.map((p) => {
+      return new HPoint(p.x + deltaX, p.y + deltaY);
+    });
+    this.pts = transPts;
   };
 }
