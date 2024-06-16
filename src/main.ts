@@ -8,13 +8,13 @@ import { HsbJsonData } from "./models/hsbJsonData";
 const hsbData: HsbJsonData = data[0];
 
 // add some extra rects ...
-// for (let idx = 0; idx < 5; idx++) {
+// for (let idx = 0; idx < 2; idx++) {
 //   const randoM = Math.floor(Math.random() * hsbData.HsbRectanglesList.length);
 //   hsbData.HsbRectanglesList.push(hsbData.HsbRectanglesList[randoM]);
 // }
 
 // add some random triangles
-// for (let idx = 0; idx < 4; idx++) {
+// for (let idx = 0; idx < 2; idx++) {
 //   const randoM = Math.floor(Math.random() * hsbData.HsbTrianglesList.length);
 //   hsbData.HsbTrianglesList.push(hsbData.HsbTrianglesList[randoM]);
 // }
@@ -22,7 +22,7 @@ const hsbData: HsbJsonData = data[0];
 //#endregion
 
 //#region config
-var gap = 10;
+var gap = 5;
 var canvaWidth = 900;
 var canvaHeight = 610;
 //#endregion

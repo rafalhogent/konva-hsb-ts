@@ -1,12 +1,22 @@
 import { getPointsFromArray, intersectionPt } from "./geometry";
-// import HRect from "./models/hrect.ts";
+import { HsbJsonData, HsbRhomb } from "./models/hsbJsonData";
+import HPolygon from "./models/hPolygon";
+import HCircle from "./models/hCircle";
+import HEllipse from "./models/hEllipse";
 import HSpace from "./models/hspace";
 import HTriangle from "./models/htriangle";
 import Konva from "konva";
 import HPoint from "./models/hpoint";
 import HRect from "./models/hrect";
-import { createKonvaRect, createKonvaTriangle } from "./helpers/konva-helper";
-import { HsbJsonData } from "./models/hsbJsonData";
+import {
+  createKonvaCircle,
+  createKonvaEllipse,
+  // createKonvaPoly,
+  createKonvaRect,
+  createKonvaRhomb,
+  createKonvaTriangle,
+  // getKonvaPoint,
+} from "./helpers/konva-helper";
 
 export const mapAndCalculate = (
   jsonData: HsbJsonData,
@@ -15,8 +25,7 @@ export const mapAndCalculate = (
   gap: number,
   layer: Konva.Layer
 ) => {
-  const freeSpace: any[] = [];
-
+  const freeSpace: HSpace[] = [];
 
   let lastX = gap;
   let lastY = gap;
@@ -38,12 +47,12 @@ export const mapAndCalculate = (
     // check remaining row space
     if (rcWidth + gap + lastX > canvaWidth) {
       // create remaining free space on row last item
-      const remainingRowSpace = new HSpace(
-        lastX,
-        lastY,
-        canvaWidth - gap,
-        maxRowH
-      );
+      const remainingRowSpace = new HSpace([
+        { x: lastX, y: lastY },
+        { x: lastX, y: maxRowH },
+        { x: canvaWidth, y: maxRowH },
+        { x: canvaWidth, y: lastY },
+      ]);
       freeSpace.push(remainingRowSpace);
       lastX = gap;
       lastY = maxRowH + gap;
@@ -56,6 +65,14 @@ export const mapAndCalculate = (
     maxRowH = Math.max(maxRowH, rc.topRightPt.y);
     layer.add(createKonvaRect(rc.pts));
   });
+  // const remainingRowSpace = new HSpace(lastX, lastY, canvaWidth - gap, maxRowH);
+  const remainingRowSpaceRects = new HSpace([
+    { x: lastX, y: lastY },
+    { x: lastX, y: maxRowH },
+    { x: canvaWidth, y: maxRowH },
+    { x: canvaWidth, y: lastY },
+  ]);
+  freeSpace.push(remainingRowSpaceRects);
   lastY = maxRowH + gap;
   //#endregion
 
@@ -79,6 +96,13 @@ export const mapAndCalculate = (
     if (lastTriangle && lastTriangle.maxX + t.width + gap > canvaWidth) {
       swap = false;
       lastY = maxRowH + gap;
+      const remainingRowSpaceTriangles = new HSpace([
+        lastTriangle ? lastTriangle.bottomRightPt : { x: lastX, y: lastY },
+        lastTriangle ? lastTriangle.topRightPt : { x: lastX, y: lastY },
+        { x: canvaWidth, y: maxRowH },
+        { x: canvaWidth, y: lastY },
+      ]);
+      freeSpace.push(remainingRowSpaceTriangles);
       lastTriangle = undefined;
     }
 
@@ -125,79 +149,114 @@ export const mapAndCalculate = (
     // add rendered item to scene
     layer.add(createKonvaTriangle(t.pts));
   });
+  const remainingRowSpaceTriangles = new HSpace([
+    // lastTriangle ? lastTriangle.bottomRightPt : { x: lastX, y: lastY },
+    // lastTriangle ? lastTriangle.topRightPt : { x: lastX, y: lastY },
+    lastTriangle ? { x: lastTriangle.maxX, y: lastY } : { x: lastX, y: lastY },
+    lastTriangle
+      ? { x: lastTriangle.maxX, y: maxRowH }
+      : { x: lastX, y: lastY },
+    { x: canvaWidth, y: maxRowH },
+    { x: canvaWidth, y: lastY },
+  ]);
+  freeSpace.push(remainingRowSpaceTriangles);
+  //#endregion
+
+  lastY = maxRowH + gap;
+  lastX = gap;
+
+  //#region ellipses
+  const ellipses = jsonData.HsbEllipsesList.map((e) => {
+    const wth = Math.min(e.WidthRadius, e.HeightRadius);
+    const hth = Math.max(e.WidthRadius, e.HeightRadius);
+    return new HEllipse(canvaWidth / 2, canvaHeight / 2, wth, hth);
+  });
+
+  ellipses.sort((a, b) => {
+    return b.rHeight - a.rHeight;
+  });
+
+  ellipses.forEach((e) => {
+    e.x = lastX + gap + e.rWidth;
+    e.y = lastY + gap + e.rHeight;
+    layer.add(createKonvaEllipse(e.rWidth, e.rHeight, e.x, e.y));
+    maxRowH = Math.max(maxRowH, e.y + e.rHeight);
+    lastX = lastX + gap + e.width;
+  });
+
+  const ellipseFreeRowSpace = new HSpace([
+    { x: lastX, y: lastY },
+    { x: lastX, y: canvaHeight },
+    { x: canvaWidth, y: canvaHeight },
+    { x: canvaWidth, y: lastY },
+  ]);
+  freeSpace.push(ellipseFreeRowSpace);
   //#endregion
 
   //#region rombs
-  // const rombs = rombsJson.map((rh) => {
-  //   const romb = new Konva.Line({
-  //     points: [...rh.Pt1, ...rh.Pt2, ...rh.Pt3, ...rh.Pt4],
-  //     fill: rombColor,
-  //     stroke: strokeColor,
-  //     draggable: true,
-  //     strokeWidth: strokeWidth,
-  //     closed: true,
-  //     name: "poly",
-  //   });
-  //   return romb;
-  // });
-  // rombs.forEach((rh) => {
-  //   // layer.add(rh);
-  // });
+  const rhombs: HPolygon[] = jsonData.HsbRhombusList.map((t: HsbRhomb) => {
+    const pointsInts = [...t.Pt1, ...t.Pt2, ...t.Pt3, ...t.Pt4];
+    const rho = new HPolygon(getPointsFromArray(pointsInts));
+    rho.orientAlongXAx();
+    return rho;
+  });
+
+  rhombs.sort((a, b) => b.height - a.height);
+
+  rhombs.forEach((rh) => {
+    const spaces = [...freeSpace];
+    const spacesFIltered = spaces.filter((s) => s.height - rh.height > 0);
+    spacesFIltered.sort((a, b) => {
+      return a.height - rh.height - (b.height - rh.height);
+    });
+
+    if (spacesFIltered.length) {
+      for (let idx = 0; idx < spacesFIltered.length; idx++) {
+        const space = spacesFIltered[idx];
+        if (!space.lastX) space.lastX = space.bottonLeftPt.x + gap;
+        if (space.maxX - gap - space.lastX > rh.width) {
+          rh.translate(space.lastX - rh.minX, space.minY - rh.minY + gap);
+          space.lastX = rh.maxX + gap;
+          break;
+        }
+      }
+    }
+
+    layer.add(createKonvaRhomb(rh.pts));
+  });
   //#endregion
 
   //#region circles
-  // const circles = circlesJson.map((c) => {
-  //   const circle = new Konva.Circle({
-  //     radius: c.Radius,
-  //     fill: circleColor,
-  //     stroke: strokeColor,
-  //     strokeWidth: strokeWidth,
-  //     draggable: true,
-  //     name: "circ",
-  //   });
+  const circles = jsonData.HsbCirclesList.map((c) => {
+    return new HCircle(c.Pt1[0], c.Pt1[1], c.Radius);
+  });
 
-  //   circle.x(c.Pt1[0]);
-  //   circle.y(c.Pt1[1]);
-  //   return circle;
-  // });
-  // circles.forEach((c) => {
-  //   // layer.add(c);
-  // });
-  //#endregion
-
-  //#region ellipses
-  // const ellipses = ellipsesJson.map((e) => {
-  //   const ellipse = new Konva.Ellipse({
-  //     x: stage.width() / 2,
-  //     y: stage.height() / 2,
-  //     radiusX: e.WidthRadius,
-  //     radiusY: e.HeightRadius,
-  //     fill: ellipseColor,
-  //     stroke: strokeColor,
-  //     strokeWidth: strokeWidth,
-  //     draggable: true,
-  //     name: "elli",
-  //   });
-  //   return ellipse;
-  // });
-
-  // ellipses.forEach((e) => {
-  //   // layer.add(e);
-  // });
+  circles.forEach((c) => {
+    const spaces = [...freeSpace];
+    const spacesFIltered = spaces.filter(
+      (s) => s.height - 2 * c.radius > 0 && s.width - 2 * c.radius > 0
+    );
+    spacesFIltered.sort((a, b) => {
+      return b.height - a.height;
+    });
+    if (spacesFIltered.length) {
+      for (let idx = 0; idx < spacesFIltered.length; idx++) {
+        const space = spacesFIltered[idx];
+        if (!space.lastX) space.lastX = space.bottonLeftPt.x + gap;
+        if (space.maxX - gap - space.lastX > c.diameter) {
+          c.translate(space.lastX - c.minX, space.minY - c.minY + gap);
+          layer.add(createKonvaCircle(c.radius, c.x, c.y));
+          space.lastX = c.maxX + gap;
+          break;
+        }
+      }
+    }
+  });
   //#endregion
 
   //#region free-space
-  freeSpace.forEach((s) => {
-    const space = new Konva.Line({
-      points: [s.minx, s.miny, s.minx, s.maxy, s.maxx, s.maxy, s.maxx, s.miny],
-      fill: "gray",
-      draggable: false,
-      strokeWidth: 0,
-      closed: true,
-      name: "space",
-      opacity: 0.5,
-    });
-    layer.add(space);
-  });
+  // freeSpace.forEach((s) => {
+  //   // layer.add(createKonvaPoly(s.pts));
+  // });
   //#endregion
 };

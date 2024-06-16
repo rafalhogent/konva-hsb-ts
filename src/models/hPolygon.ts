@@ -139,7 +139,11 @@ export default class HPolygon {
   }
 
   get width() {
-    return this.rightBottomPt.x - this.leftBottomPt.x;
+    return this.maxX - this.minX;
+  }
+
+  get height() {
+    return this.maxY - this.minY;
   }
 
   rotate = (center: HPoint, angleRad: number) => {
