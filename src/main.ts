@@ -1,18 +1,12 @@
 import { addElementManipulation } from "./manipulation";
-import {
-  orientPoly,
-  getPolyTopRightBoundryPt,
-  getPointsFromArray,
-  translatePoly,
-  getPolyMinLeftBoundryPt,
-  intersectionPt,
-} from "./geometry";
+import { getPointsFromArray, intersectionPt } from "./geometry";
 // import HRect from "./models/hrect.ts";
 import HSpace from "./models/hspace";
 import HTriangle from "./models/htriangle";
 import Konva from "konva";
 import data from "../src/data/hsbExam.json";
 import HPoint from "./models/hpoint";
+import HRect from "./models/hrect";
 import { createKonvaRect, createKonvaTriangle } from "./helpers/konva-helper";
 
 //#region import source
@@ -49,28 +43,31 @@ stage.add(layer);
 const freeSpace: any[] = [];
 
 // push some extra rects ...
-// for (let idx = 0; idx < 7; idx++) {
+// for (let idx = 0; idx < 5; idx++) {
 //   const randoM = Math.floor(Math.random() * rectsJson.length);
 //   rectsJson.push(rectsJson[randoM]);
 // }
 
-//#region rects
-const rects: Konva.Line[] = rectsJson.map((r: any) => {
-  return createKonvaRect(
-    getPointsFromArray([...r.Pt1, ...r.Pt2, ...r.Pt3, ...r.Pt4])
-  );
-});
-
 let lastX = gap;
 let lastY = gap;
 let maxRowH = gap;
-rects.forEach((r) => {
-  orientPoly(r);
-  const p0 = getPolyMinLeftBoundryPt(r);
-  const p2 = getPolyTopRightBoundryPt(r);
-  const polyWidth = p2.x - p0.x;
 
-  if (polyWidth + gap + lastX > canvaWidth) {
+//#region rects
+const rectangles: HRect[] = rectsJson.map((t: any) => {
+  const pointsInts = [...t.Pt1, ...t.Pt2, ...t.Pt3, ...t.Pt4];
+  const rc = new HRect(getPointsFromArray(pointsInts));
+  rc.orientAlongXAx();
+  return rc;
+});
+
+rectangles.sort((a, b) => b.width - a.width);
+
+rectangles.forEach((rc) => {
+  const rcWidth = rc.width;
+
+  // check remaining row space 
+  if (rcWidth + gap + lastX > canvaWidth) {
+    // create remaining free space on row last item
     const remainingRowSpace = new HSpace(
       lastX,
       lastY,
@@ -81,21 +78,21 @@ rects.forEach((r) => {
     lastX = gap;
     lastY = maxRowH + gap;
   }
-  translatePoly(lastX - p0.x, lastY - p0.y, r);
-  lastX = getPolyTopRightBoundryPt(r).x + gap;
-  const p2Translated = getPolyTopRightBoundryPt(r);
-  maxRowH = Math.max(maxRowH, p2Translated.y);
-  layer.add(r);
+
+  rc.translate(lastX - rc.minX, lastY - rc.minY);
+  
+  lastX = rc.rightBottomPt.x + gap;
+
+  maxRowH = Math.max(maxRowH, rc.topRightPt.y);
+  layer.add(createKonvaRect(rc.pts));
 });
-const remainingRowSpace = new HSpace(lastX, lastY, canvaWidth - gap, maxRowH);
-freeSpace.push(remainingRowSpace);
 lastY = maxRowH + gap;
 //#endregion
 
 //#region tringles
 
 // add some random triangles
-// for (let idx = 0; idx < 0; idx++) {
+// for (let idx = 0; idx < 4; idx++) {
 //   const randoM = Math.floor(Math.random() * trianglesJson.length);
 //   trianglesJson.push(trianglesJson[randoM]);
 // }
@@ -109,7 +106,6 @@ const triangles: HTriangle[] = trianglesJson.map((t: any) => {
 
 triangles.sort((a, b) => b.rightAngle - a.rightAngle);
 
-lastX = gap;
 let swap = false;
 let lastTriangle: HTriangle | undefined;
 
@@ -132,27 +128,27 @@ triangles.forEach((t) => {
   // check offset from last item to calculate x position
   let startPoint: HPoint;
   let compareX: number;
-  const topLeftPt = t.topLeftPt;
+  const topPt = t.topLeftPt;
   const bottonLeftPt = t.bottonLeftPt;
   if (
     lastTriangle &&
     (swap ? t.leftAngle < lastRightAngle : t.leftAngle > lastRightAngle)
   ) {
     const lastTopRight = lastTriangle.topRightPt;
-    const vstart = topLeftPt.y >= lastTopRight.y ? lastTopRight : topLeftPt;
+    const vstart = topPt.y >= lastTopRight.y ? lastTopRight : topPt;
 
     const intersection = intersectionPt(
       { x: 0, y: vstart.y },
       { x: canvaWidth, y: vstart.y },
       bottonLeftPt,
-      topLeftPt
+      topPt
     );
 
-    startPoint = intersection ? intersection : topLeftPt;
-    compareX = lastTriangle?.topRightPt.x ?? gap;
+    startPoint = intersection ? intersection : topPt;
+    compareX = lastTriangle?.topRightPt.x ?? 0;
   } else {
     startPoint = bottonLeftPt;
-    compareX = lastTriangle?.bottomRightPt.x ?? gap;
+    compareX = lastTriangle?.bottomRightPt.x ?? 0;
   }
 
   t.translate(compareX - startPoint.x + gap, 0);
@@ -163,7 +159,7 @@ triangles.forEach((t) => {
   maxRowH = Math.max(t.maxY, maxRowH);
   swap = !swap;
 
-  // add renderd item to scene
+  // add rendered item to scene
   layer.add(createKonvaTriangle(t.pts));
 });
 //#endregion
@@ -228,7 +224,6 @@ triangles.forEach((t) => {
 //#endregion
 
 //#region free-space
-// console.log("free-space", freeSpace);
 freeSpace.forEach((s) => {
   const rect = new Konva.Line({
     points: [s.minx, s.miny, s.minx, s.maxy, s.maxx, s.maxy, s.maxx, s.miny],
