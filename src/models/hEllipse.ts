@@ -23,4 +23,9 @@ export default class HEllipse {
   get height() {
     return 2 * this.rHeight;
   }
+
+  translateToPoint(x: number, y: number) {
+    this.x = x;
+    this.y = y;
+  }
 }

@@ -19,6 +19,12 @@ const hsbData: HsbJsonData = data[0];
 //   hsbData.HsbTrianglesList.push(hsbData.HsbTrianglesList[randoM]);
 // }
 
+// add some random ellipses
+// for (let idx = 0; idx < 5; idx++) {
+//   const randoM = Math.floor(Math.random() * hsbData.HsbEllipsesList.length);
+//   hsbData.HsbEllipsesList.push(hsbData.HsbEllipsesList[randoM]);
+// }
+
 //#endregion
 
 //#region config

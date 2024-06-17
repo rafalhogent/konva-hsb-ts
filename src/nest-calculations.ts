@@ -176,12 +176,52 @@ export const mapAndCalculate = (
     return b.rHeight - a.rHeight;
   });
 
+  const ellipseLocalFreeSpace: HSpace[] = [];
   ellipses.forEach((e) => {
+    let ellipsePlaced = false;
+    // check place in remaining local free-spaces
+    const ellipsLocalSpacesFiltered = ellipseLocalFreeSpace.filter(
+      (s) => s.height - e.height > 0
+    );
+
+    if (ellipsLocalSpacesFiltered.length) {
+      for (let idx = 0; idx < ellipsLocalSpacesFiltered.length; idx++) {
+        const space = ellipsLocalSpacesFiltered[idx];
+        if (!space.lastX) space.lastX = space.bottonLeftPt.x + gap;
+
+        if (
+          space.maxX - gap - space.lastX > e.width &&
+          space.height - 2 * gap > e.height + gap
+        ) {
+          e.translateToPoint(
+            space.lastX + e.rWidth,
+            space.minY + e.rHeight + gap
+          );
+          space.lastX = e.x + e.rWidth * 2 + gap;
+          ellipsePlaced = true;
+          layer.add(createKonvaEllipse(e.rWidth, e.rHeight, e.x, e.y));
+          break;
+        }
+      }
+    }
+    if (ellipsePlaced) return;
+
     e.x = lastX + gap + e.rWidth;
     e.y = lastY + gap + e.rHeight;
+
     layer.add(createKonvaEllipse(e.rWidth, e.rHeight, e.x, e.y));
     maxRowH = Math.max(maxRowH, e.y + e.rHeight);
     lastX = lastX + gap + e.width;
+    if (e.y + e.rHeight + gap < canvaHeight) {
+      ellipseLocalFreeSpace.push(
+        new HSpace([
+          { x: e.x - e.rWidth, y: e.y + e.rHeight },
+          { x: e.x - e.rWidth, y: canvaHeight },
+          { x: e.x + e.rWidth, y: canvaHeight },
+          { x: e.x + e.rWidth, y: e.y + e.rHeight },
+        ])
+      );
+    }
   });
 
   const ellipseFreeRowSpace = new HSpace([
@@ -230,6 +270,7 @@ export const mapAndCalculate = (
   const circles = jsonData.HsbCirclesList.map((c) => {
     return new HCircle(c.Pt1[0], c.Pt1[1], c.Radius);
   });
+  circles.sort((a,b) => b.diameter - a.diameter)
 
   circles.forEach((c) => {
     const spaces = [...freeSpace];
