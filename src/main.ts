@@ -25,10 +25,16 @@ const hsbData: HsbJsonData = data[0];
 //   hsbData.HsbEllipsesList.push(hsbData.HsbEllipsesList[randoM]);
 // }
 
+// add some random rhombes
+// for (let idx = 0; idx < 2; idx++) {
+//   const randoM = Math.floor(Math.random() * hsbData.HsbRhombusList.length);
+//   hsbData.HsbRhombusList.push(hsbData.HsbRhombusList[randoM]);
+// }
+
 //#endregion
 
 //#region config
-var gap = 5;
+var gap = 2;
 var canvaWidth = 900;
 var canvaHeight = 610;
 //#endregion

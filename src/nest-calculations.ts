@@ -256,6 +256,14 @@ export const mapAndCalculate = (
         if (!space.lastX) space.lastX = space.bottonLeftPt.x + gap;
         if (space.maxX - gap - space.lastX > rh.width) {
           rh.translate(space.lastX - rh.minX, space.minY - rh.minY + gap);
+          if (space.height - rh.height - 3 * gap > 0){
+            freeSpace.push(new HSpace([
+              { x: space.lastX, y: space.minY + rh.height + gap },
+              { x: space.lastX, y: space.maxY  },
+              { x: space.lastX + rh.width, y: space.maxY  },
+              { x: space.lastX + rh.width, y: space.minY + rh.height + gap },
+            ]))
+          }
           space.lastX = rh.maxX + gap;
           break;
         }
